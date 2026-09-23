@@ -2,23 +2,23 @@
 
 Home Assistant Integration für die Siegenia Aeroplus WRG Smart Module.
 Basiert auf [rikbootsman/home-assistant-siegenia-Aeroplus-WRG](https://github.com/rikbootsman/home-assistant-siegenia-Aeroplus-WRG)
-(inkl. des Ein/Aus-Fixes aus [PR #5](https://github.com/rikbootsman/home-assistant-siegenia-Aeroplus-WRG/pull/5))
-und der Protokoll-Feldtabelle aus [Apollon77/ioBroker.siegenia](https://github.com/Apollon77/ioBroker.siegenia)
-(Gerätetyp 14 = AEROPLUS).
+(inkl. des Ein/Aus-Fixes aus [PR #5](https://github.com/rikbootsman/home-assistant-siegenia-Aeroplus-WRG/pull/5)),
+mit Feldnamen, die gegen ein echtes Aeroplus-WRG-Gerät verifiziert wurden
+(nicht nur gegen Dokumentation/Referenzprojekte).
 
 **Entities:**
-- `switch` **Power** – Gerät ein-/ausschalten
-- `switch` **Automatikmodus** – Kurzschalter für Automatikbetrieb (setzt/verlässt
-  `fanmode = AUTO`; beim Ausschalten wird der zuletzt genutzte manuelle Modus
-  wiederhergestellt)
+- `switch` **Power** – Gerät ein-/ausschalten (`devicestate.deviceactive`)
+- `switch` **Automatikmodus** – Automatikbetrieb ein-/ausschalten (`automode`,
+  ein eigenständiges Feld, unabhängig vom Lüftungsmodus)
 - `select` **Lüftungsmodus** – Zuluft / Abluft / Zu-/Abluft / Zu-/Abluft mit
-  Wärmerückgewinnung / Automatik (`fanmode`)
+  Wärmerückgewinnung (`fanmode`)
 - `number` **Lüftungsgeschwindigkeit** – manuelle Ziel-Lüfterstufe in % (`fanpower`)
 - `number` **AutomatikGeschwindigkeit** – maximale Lüfterstufe im Automatikbetrieb
   in % (`automode_maxairflow`)
 - `sensor` **Feedback Lüftergeschwindigkeit** – tatsächlich laufende Lüfterstufe
-  in % (`fanpower`, read-only)
-- `sensor` **Innen-/Außentemperatur**, **CO₂**
+  in % (`fanpower`, read-only, 0 % wenn ausgeschaltet)
+- `sensor` **Innen-/Außentemperatur**, **CO₂** (CO₂ wird `unavailable` wenn
+  ausgeschaltet, da dann nicht mehr gemessen wird)
 
 Timer, Beleuchtung, Sash-/Fenstersteuerung und ähnliche Funktionen anderer
 Siegenia-Gerätetypen sind nicht enthalten, da sie für Aeroplus WRG nicht
