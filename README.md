@@ -79,26 +79,6 @@ logger:
     custom_components.aeroplus_wrg: debug
 ```
 
-## Icon in der Home-Assistant-Oberfläche
-
-Home Assistant und HACS holen Integrations-Icons zentral aus dem öffentlichen
-[home-assistant/brands](https://github.com/home-assistant/brands)-Repository
-(anhand der Domain `aeroplus_wrg`) – es reicht nicht, ein Icon einfach in
-`custom_components/aeroplus_wrg` abzulegen.
-
-Unter [`brand_assets/custom_integrations/aeroplus_wrg`](brand_assets/custom_integrations/aeroplus_wrg)
-liegt ein fertiges, generisches Lüfter-Icon (`icon.png` 256×256, `icon@2x.png`
-512×512) im von `home-assistant/brands` geforderten Format. Um es sichtbar zu
-machen:
-
-1. [home-assistant/brands](https://github.com/home-assistant/brands) forken
-2. Den Ordner `brand_assets/custom_integrations/aeroplus_wrg` aus diesem
-   Repository 1:1 nach `custom_integrations/aeroplus_wrg` im Fork kopieren
-3. Pull Request gegen `home-assistant/brands` öffnen
-4. Nach Merge (kann etwas dauern, liegt bei den dortigen Maintainern) taucht
-   das Icon automatisch in Home Assistant und HACS auf – ein Neustart oder
-   Cache-Leeren im Frontend reicht danach
-
 ## Lizenz
 
 MIT License, siehe [LICENSE](LICENSE). Basierend auf dem MIT-lizenzierten
