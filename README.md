@@ -1,19 +1,28 @@
-# Aeroplus WRG for Home Assistant (Switch Only)
+# Aeroplus WRG for Home Assistant
 
-Schlanke Home Assistant Integration für die Siegenia Aeroplus WRG Smart Module.
+Home Assistant Integration für die Siegenia Aeroplus WRG Smart Module.
 Basiert auf [rikbootsman/home-assistant-siegenia-Aeroplus-WRG](https://github.com/rikbootsman/home-assistant-siegenia-Aeroplus-WRG)
-(inkl. des Ein/Aus-Fixes aus [PR #5](https://github.com/rikbootsman/home-assistant-siegenia-Aeroplus-WRG/pull/5)),
-aber bewusst auf das Nötigste reduziert:
+(inkl. des Ein/Aus-Fixes aus [PR #5](https://github.com/rikbootsman/home-assistant-siegenia-Aeroplus-WRG/pull/5))
+und der Protokoll-Feldtabelle aus [Apollon77/ioBroker.siegenia](https://github.com/Apollon77/ioBroker.siegenia)
+(Gerätetyp 14 = AEROPLUS).
 
-- **Nur Ein/Aus** – ein einzelner Schalter (`switch`) zum Ein-/Ausschalten des Geräts.
-  Alle anderen Modi (Automatik, Lüfterstufe, Timer, …) werden weiterhin über die
-  Siegenia-App gesteuert und von dieser Integration nicht angefasst.
-- **Sensoren**: Innentemperatur, Außentemperatur und CO₂-Gehalt werden nach
-  Home Assistant übertragen.
+**Entities:**
+- `switch` **Power** – Gerät ein-/ausschalten
+- `switch` **Automatikmodus** – Kurzschalter für Automatikbetrieb (setzt/verlässt
+  `fanmode = AUTO`; beim Ausschalten wird der zuletzt genutzte manuelle Modus
+  wiederhergestellt)
+- `select` **Lüftungsmodus** – Zuluft / Abluft / Zu-/Abluft / Zu-/Abluft mit
+  Wärmerückgewinnung / Automatik (`fanmode`)
+- `number` **Lüftungsgeschwindigkeit** – manuelle Ziel-Lüfterstufe in % (`fanpower`)
+- `number` **AutomatikGeschwindigkeit** – maximale Lüfterstufe im Automatikbetrieb
+  in % (`automode_maxairflow`)
+- `sensor` **Feedback Lüftergeschwindigkeit** – tatsächlich laufende Lüfterstufe
+  in % (`fanpower`, read-only)
+- `sensor` **Innen-/Außentemperatur**, **CO₂**
 
-Alle anderen Entitäten (Lüfter-Prozentsteuerung, Automatik-Schalter, Leistungs-Zahl,
-Rohzustand, Verbindungsstatus) aus dem Originalprojekt sind absichtlich **nicht**
-enthalten.
+Timer, Beleuchtung, Sash-/Fenstersteuerung und ähnliche Funktionen anderer
+Siegenia-Gerätetypen sind nicht enthalten, da sie für Aeroplus WRG nicht
+zutreffen bzw. bewusst weiterhin über die Siegenia-App laufen sollen.
 
 ## Warum ein eigener On/Off-Befehl nötig ist
 
@@ -55,7 +64,12 @@ umgesetzt.
    - SSL (Standard: an)
 
 Für jedes eingerichtete Gerät entstehen:
-- `switch.<name>_power` – Ein/Aus
+- `switch.<name>_power`
+- `switch.<name>_automatikmodus`
+- `select.<name>_luftungsmodus`
+- `number.<name>_luftungsgeschwindigkeit`
+- `number.<name>_automatikgeschwindigkeit`
+- `sensor.<name>_feedback_luftergeschwindigkeit`
 - `sensor.<name>_indoor_temperature`
 - `sensor.<name>_outdoor_temperature`
 - `sensor.<name>_co2`

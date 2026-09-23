@@ -4,11 +4,18 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONCENTRATION_PARTS_PER_MILLION, UnitOfTemperature
+from homeassistant.const import CONCENTRATION_PARTS_PER_MILLION, PERCENTAGE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DATA_COORDINATOR, DOMAIN, KEYS_CO2, KEYS_TEMPERATURE_INDOOR, KEYS_TEMPERATURE_OUTDOOR
+from .const import (
+    DATA_COORDINATOR,
+    DOMAIN,
+    KEY_FAN_POWER,
+    KEYS_CO2,
+    KEYS_TEMPERATURE_INDOOR,
+    KEYS_TEMPERATURE_OUTDOOR,
+)
 from .device import build_device_info, combined_data, flatten, get_first, get_system_name
 
 
@@ -19,6 +26,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         AeroplusTemperatureSensor(coordinator, entry, "indoor", "Indoor Temperature", KEYS_TEMPERATURE_INDOOR),
         AeroplusTemperatureSensor(coordinator, entry, "outdoor", "Outdoor Temperature", KEYS_TEMPERATURE_OUTDOOR),
         AeroplusCo2Sensor(coordinator, entry),
+        AeroplusFanSpeedFeedbackSensor(coordinator, entry),
     ]
     async_add_entities(entities)
 
@@ -64,3 +72,20 @@ class AeroplusCo2Sensor(_AeroplusBaseSensor):
     @property
     def native_value(self) -> float | None:
         return get_first(self._flat(), KEYS_CO2)
+
+
+class AeroplusFanSpeedFeedbackSensor(_AeroplusBaseSensor):
+    """Read-only feedback of the fan's actual current speed (fanpower), as
+    reported by the device - independent of whether it was set manually or by
+    automatic mode."""
+
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_icon = "mdi:fan"
+
+    def __init__(self, coordinator, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry, "fanspeed-feedback", "Feedback Lüftergeschwindigkeit")
+
+    @property
+    def native_value(self) -> float | None:
+        return get_first(self._flat(), [KEY_FAN_POWER])

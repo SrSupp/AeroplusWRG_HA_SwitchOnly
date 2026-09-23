@@ -1,6 +1,6 @@
 {
   "domain": "aeroplus_wrg",
-  "name": "Aeroplus WRG (Switch Only)",
+  "name": "Aeroplus WRG",
   "codeowners": ["@SrSupp"],
   "config_flow": true,
   "dependencies": [],
@@ -8,5 +8,5 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/SrSupp/AeroplusWRG_HA_SwitchOnly/issues",
   "requirements": [],
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

@@ -1,8 +1,41 @@
 from __future__ import annotations
 
+import time
 from typing import Any
 
 from .const import DOMAIN
+
+# How long a just-commanded value is shown optimistically before falling back
+# to whatever the coordinator actually reports, in case the command silently
+# failed.
+OPTIMISTIC_TIMEOUT_SECONDS = 20
+
+
+class OptimisticStateMixin:
+    """Show a just-commanded value immediately, until the coordinator's data
+    confirms it (or the timeout above elapses).
+
+    The device needs a moment to actually apply a setDeviceParams call, so
+    reading state right back after sending one often returns the still-stale
+    value - without this, entities would flash back to the old value for a
+    few seconds after every command.
+    """
+
+    _optimistic_value: Any = None
+    _optimistic_expires: float = 0.0
+
+    def _resolve_optimistic(self, actual: Any) -> Any:
+        if self._optimistic_value is not None:
+            if actual == self._optimistic_value or time.monotonic() > self._optimistic_expires:
+                self._optimistic_value = None
+            else:
+                return self._optimistic_value
+        return actual
+
+    def _set_optimistic(self, value: Any) -> None:
+        self._optimistic_value = value
+        self._optimistic_expires = time.monotonic() + OPTIMISTIC_TIMEOUT_SECONDS
+        self.async_write_ha_state()
 
 
 def _info_from_data(data: dict | None) -> dict:

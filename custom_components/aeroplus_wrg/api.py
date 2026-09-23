@@ -220,3 +220,10 @@ class SiegeniaClient:
         # setDeviceParams expects it nested below "devicestate". Sent flat,
         # the device silently accepts the call and ignores it.
         return await self._send("setDeviceParams", params={"devicestate": {"deviceactive": active}})
+
+    async def set_device_params(self, params: dict) -> dict:
+        # Unlike deviceactive, fanmode/fanpower/automode_maxairflow are
+        # top-level getDeviceParams fields (confirmed via
+        # Apollon77/ioBroker.siegenia's device-type-14/AEROPLUS field map) and
+        # are written flat, e.g. {"fanmode": "AUTO"}.
+        return await self._send("setDeviceParams", params=params)
