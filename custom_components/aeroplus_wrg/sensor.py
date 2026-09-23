@@ -16,7 +16,7 @@ from .const import (
     KEYS_TEMPERATURE_INDOOR,
     KEYS_TEMPERATURE_OUTDOOR,
 )
-from .device import build_device_info, combined_data, flatten, get_first, get_system_name
+from .device import build_device_info, combined_data, flatten, get_first, get_system_name, is_device_active
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities) -> None:
@@ -62,12 +62,20 @@ class AeroplusTemperatureSensor(_AeroplusBaseSensor):
 
 
 class AeroplusCo2Sensor(_AeroplusBaseSensor):
+    """CO2 reading is only meaningful while air is actually being sampled, so
+    this goes unavailable rather than showing a frozen/stale value once the
+    device is switched off."""
+
     _attr_device_class = SensorDeviceClass.CO2
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = CONCENTRATION_PARTS_PER_MILLION
 
     def __init__(self, coordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry, "co2", "CO2")
+
+    @property
+    def available(self) -> bool:
+        return super().available and is_device_active(self.coordinator.data)
 
     @property
     def native_value(self) -> float | None:
@@ -77,7 +85,8 @@ class AeroplusCo2Sensor(_AeroplusBaseSensor):
 class AeroplusFanSpeedFeedbackSensor(_AeroplusBaseSensor):
     """Read-only feedback of the fan's actual current speed (fanpower), as
     reported by the device - independent of whether it was set manually or by
-    automatic mode."""
+    automatic mode. Reads as 0% while the device is off, since fanpower then
+    still reports its last active value instead of 0."""
 
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = PERCENTAGE
@@ -88,4 +97,6 @@ class AeroplusFanSpeedFeedbackSensor(_AeroplusBaseSensor):
 
     @property
     def native_value(self) -> float | None:
+        if not is_device_active(self.coordinator.data):
+            return 0
         return get_first(self._flat(), [KEY_FAN_POWER])

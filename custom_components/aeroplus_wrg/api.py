@@ -161,6 +161,10 @@ class SiegeniaClient:
             req["params"] = params
         req["id"] = rid
 
+        if _LOGGER.isEnabledFor(logging.DEBUG):
+            redacted = {k: ("***" if k == "password" else v) for k, v in req.items()}
+            _LOGGER.debug("WS SEND: %s", json.dumps(redacted))
+
         loop = asyncio.get_event_loop()
         fut: asyncio.Future = loop.create_future()
         self._pending[rid] = fut
@@ -183,6 +187,7 @@ class SiegeniaClient:
         except asyncio.TimeoutError:
             self._pending.pop(rid, None)
             raise TimeoutError("Siegenia request timed out") from None
+        _LOGGER.debug("WS RECV for id=%s: status=%s payload=%s", rid, status, payload)
         if status != "ok":
             raise RuntimeError(f"Siegenia error: {status}")
         return payload

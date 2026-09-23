@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from .const import DOMAIN
+from .const import DOMAIN, KEY_DEVICE_ACTIVE
 
 # How long a just-commanded value is shown optimistically before falling back
 # to whatever the coordinator actually reports, in case the command silently
@@ -87,6 +87,10 @@ def get_first(flat: dict[str, Any], keys: list[str]) -> Any:
 def get_system_name(data: dict | None) -> str | None:
     flat = flatten(combined_data(data))
     return get_first(flat, ["systemname", "devicename", "device_name"])
+
+
+def is_device_active(data: dict | None) -> bool:
+    return bool(flatten(combined_data(data)).get(KEY_DEVICE_ACTIVE))
 
 
 def build_device_info(data: dict | None, entry_id: str, host: str | None = None) -> dict:
