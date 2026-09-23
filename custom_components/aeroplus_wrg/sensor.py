@@ -13,6 +13,8 @@ from .const import (
     DOMAIN,
     KEY_FAN_POWER,
     KEYS_CO2,
+    KEYS_HUMIDITY_INDOOR,
+    KEYS_HUMIDITY_OUTDOOR,
     KEYS_TEMPERATURE_INDOOR,
     KEYS_TEMPERATURE_OUTDOOR,
 )
@@ -25,6 +27,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     entities: list[SensorEntity] = [
         AeroplusTemperatureSensor(coordinator, entry, "indoor", "Indoor Temperature", KEYS_TEMPERATURE_INDOOR),
         AeroplusTemperatureSensor(coordinator, entry, "outdoor", "Outdoor Temperature", KEYS_TEMPERATURE_OUTDOOR),
+        AeroplusHumiditySensor(coordinator, entry, "humidity-indoor", "Indoor Humidity", KEYS_HUMIDITY_INDOOR),
+        AeroplusHumiditySensor(coordinator, entry, "humidity-outdoor", "Outdoor Humidity", KEYS_HUMIDITY_OUTDOOR),
         AeroplusCo2Sensor(coordinator, entry),
         AeroplusFanSpeedFeedbackSensor(coordinator, entry),
     ]
@@ -51,6 +55,20 @@ class AeroplusTemperatureSensor(_AeroplusBaseSensor):
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+
+    def __init__(self, coordinator, entry: ConfigEntry, slug: str, label: str, keys: list[str]) -> None:
+        super().__init__(coordinator, entry, slug, label)
+        self._keys = keys
+
+    @property
+    def native_value(self) -> float | None:
+        return get_first(self._flat(), self._keys)
+
+
+class AeroplusHumiditySensor(_AeroplusBaseSensor):
+    _attr_device_class = SensorDeviceClass.HUMIDITY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PERCENTAGE
 
     def __init__(self, coordinator, entry: ConfigEntry, slug: str, label: str, keys: list[str]) -> None:
         super().__init__(coordinator, entry, slug, label)

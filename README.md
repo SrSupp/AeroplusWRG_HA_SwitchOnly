@@ -12,13 +12,13 @@ mit Feldnamen, die gegen ein echtes Aeroplus-WRG-Gerät verifiziert wurden
   ein eigenständiges Feld, unabhängig vom Lüftungsmodus)
 - `select` **Lüftungsmodus** – Zuluft / Abluft / Zu-/Abluft / Zu-/Abluft mit
   Wärmerückgewinnung (`fanmode`)
-- `number` **Lüftungsgeschwindigkeit** – manuelle Ziel-Lüfterstufe in % (`fanpower`)
-- `number` **AutomatikGeschwindigkeit** – maximale Lüfterstufe im Automatikbetrieb
-  in % (`automode_maxairflow`)
+- `number` **Lüftungsgeschwindigkeit** – Ziel-Lüfterstufe in %; steuert bei
+  ausgeschaltetem Automatikmodus `fanpower`, bei eingeschaltetem Automatikmodus
+  `automode_maxairflow` (die Obergrenze der Automatik) – ein Regler statt zwei
 - `sensor` **Feedback Lüftergeschwindigkeit** – tatsächlich laufende Lüfterstufe
   in % (`fanpower`, read-only, 0 % wenn ausgeschaltet)
-- `sensor` **Innen-/Außentemperatur**, **CO₂** (CO₂ wird `unavailable` wenn
-  ausgeschaltet, da dann nicht mehr gemessen wird)
+- `sensor` **Innen-/Außentemperatur**, **Innen-/Außenfeuchtigkeit**, **CO₂**
+  (CO₂ wird `unavailable` wenn ausgeschaltet, da dann nicht mehr gemessen wird)
 
 Timer, Beleuchtung, Sash-/Fenstersteuerung und ähnliche Funktionen anderer
 Siegenia-Gerätetypen sind nicht enthalten, da sie für Aeroplus WRG nicht
@@ -44,7 +44,7 @@ umgesetzt.
 ### Über HACS (empfohlen)
 1. HACS öffnen → Integrationen → Menü (⋮) → "Benutzerdefinierte Repositories"
 2. Dieses Repository hinzufügen (Typ: Integration)
-3. "Aeroplus WRG (Switch Only)" installieren
+3. "Aeroplus WRG" installieren
 4. Home Assistant neu starten
 
 ### Manuell
@@ -68,11 +68,18 @@ Für jedes eingerichtete Gerät entstehen:
 - `switch.<name>_automatikmodus`
 - `select.<name>_luftungsmodus`
 - `number.<name>_luftungsgeschwindigkeit`
-- `number.<name>_automatikgeschwindigkeit`
 - `sensor.<name>_feedback_luftergeschwindigkeit`
 - `sensor.<name>_indoor_temperature`
 - `sensor.<name>_outdoor_temperature`
+- `sensor.<name>_indoor_humidity`
+- `sensor.<name>_outdoor_humidity`
 - `sensor.<name>_co2`
+
+> Falls vorher schon eine separate `number.<name>_automatikgeschwindigkeit`
+> vorhanden war: die verschwindet mit diesem Update (aufgegangen in
+> `number.<name>_luftungsgeschwindigkeit`, siehe oben) und kann in
+> Einstellungen → Geräte & Dienste → Entitäten manuell gelöscht werden, falls
+> sie als "nicht mehr bereitgestellt" auftaucht.
 
 ## Technische Details
 

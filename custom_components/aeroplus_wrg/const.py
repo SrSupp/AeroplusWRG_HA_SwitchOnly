@@ -18,6 +18,8 @@ HEARTBEAT_SECONDS = 10
 KEY_DEVICE_ACTIVE = "deviceactive"
 KEYS_TEMPERATURE_INDOOR = ["airbase.temperature.indoor", "temperature.indoor"]
 KEYS_TEMPERATURE_OUTDOOR = ["airbase.temperature.outdoor", "temperature.outdoor"]
+KEYS_HUMIDITY_INDOOR = ["airbase.humidity.indoor", "humidity.indoor"]
+KEYS_HUMIDITY_OUTDOOR = ["airbase.humidity.outdoor", "humidity.outdoor"]
 KEYS_CO2 = ["airquality.co2content", "co2_value"]
 
 # Confirmed against a live device's getDeviceParams response (2026-09-23):
