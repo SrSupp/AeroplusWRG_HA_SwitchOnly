@@ -41,6 +41,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
     await client.connect()
 
+    speed_memory = await FanSpeedMemory.async_load(hass, entry.entry_id)
+
     async def _async_update() -> dict:
         try:
             if not client.connected:
@@ -86,7 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_CLIENT: client,
         DATA_COORDINATOR: coordinator,
-        DATA_SPEED_MEMORY: FanSpeedMemory(),
+        DATA_SPEED_MEMORY: speed_memory,
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -102,3 +104,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             if client:
                 await client.close()
     return unload_ok
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Clean up the persisted fan speed memory when the integration itself
+    (not just a reload) is removed, so no orphaned storage file is left
+    behind."""
+    await FanSpeedMemory.async_remove(hass, entry.entry_id)

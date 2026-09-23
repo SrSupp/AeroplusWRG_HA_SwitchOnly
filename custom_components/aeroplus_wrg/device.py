@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+from homeassistant.helpers.storage import Store
 
 from .const import DOMAIN, KEY_AUTOMODE_MAX_AIRFLOW, KEY_DEVICE_ACTIVE, KEY_FAN_POWER
+
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
+
+SPEED_MEMORY_STORAGE_VERSION = 1
 
 # How long a just-commanded value is shown optimistically before falling back
 # to whatever the coordinator actually reports, in case the command silently
@@ -43,18 +50,36 @@ class FanSpeedMemory:
     vs automatic automode_maxairflow) so that toggling Automatikmodus
     restores whatever was last configured for the mode being entered,
     instead of leaving it at whatever value that field currently happens to
-    hold on the device.
+    hold on the device. Persisted via Home Assistant's storage helper, so it
+    survives restarts.
     """
 
-    def __init__(self) -> None:
-        self._values: dict[str, int] = {}
+    def __init__(self, store: Store, initial: dict[str, int] | None = None) -> None:
+        self._store = store
+        self._values: dict[str, int] = dict(initial or {})
 
-    def remember(self, key: str, value: int) -> None:
-        if key in (KEY_FAN_POWER, KEY_AUTOMODE_MAX_AIRFLOW):
-            self._values[key] = value
+    @staticmethod
+    def _storage_key(entry_id: str) -> str:
+        return f"{DOMAIN}_{entry_id}_speed_memory"
+
+    @classmethod
+    async def async_load(cls, hass: "HomeAssistant", entry_id: str) -> "FanSpeedMemory":
+        store = Store(hass, SPEED_MEMORY_STORAGE_VERSION, cls._storage_key(entry_id))
+        data = await store.async_load()
+        return cls(store, data if isinstance(data, dict) else None)
+
+    @classmethod
+    async def async_remove(cls, hass: "HomeAssistant", entry_id: str) -> None:
+        await Store(hass, SPEED_MEMORY_STORAGE_VERSION, cls._storage_key(entry_id)).async_remove()
 
     def value_for(self, key: str) -> int | None:
         return self._values.get(key)
+
+    async def remember(self, key: str, value: int) -> None:
+        if key not in (KEY_FAN_POWER, KEY_AUTOMODE_MAX_AIRFLOW):
+            return
+        self._values[key] = value
+        await self._store.async_save(self._values)
 
 
 def _info_from_data(data: dict | None) -> dict:

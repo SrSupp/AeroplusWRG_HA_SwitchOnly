@@ -68,5 +68,5 @@ class AeroplusFanSpeedNumber(CoordinatorEntity, NumberEntity):
         key = self._active_key()
         target = int(round(value))
         await self._client.set_device_params({key: target})
-        self._speed_memory.remember(key, target)
+        await self._speed_memory.remember(key, target)
         await self.coordinator.async_request_refresh()
