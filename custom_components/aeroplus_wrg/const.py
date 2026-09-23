@@ -7,6 +7,7 @@ WS_PATH = "/WebSocket"
 
 DATA_CLIENT = "client"
 DATA_COORDINATOR = "coordinator"
+DATA_SPEED_MEMORY = "speed_memory"
 
 UPDATE_INTERVAL_SECONDS = 10
 HEARTBEAT_SECONDS = 10

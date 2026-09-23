@@ -14,7 +14,10 @@ mit Feldnamen, die gegen ein echtes Aeroplus-WRG-Gerät verifiziert wurden
   Wärmerückgewinnung (`fanmode`)
 - `number` **Lüftungsgeschwindigkeit** – Ziel-Lüfterstufe in %; steuert bei
   ausgeschaltetem Automatikmodus `fanpower`, bei eingeschaltetem Automatikmodus
-  `automode_maxairflow` (die Obergrenze der Automatik) – ein Regler statt zwei
+  `automode_maxairflow` (die Obergrenze der Automatik) – ein Regler statt zwei.
+  Der zuletzt gesetzte Wert wird pro Modus gemerkt und beim Umschalten des
+  Automatikmodus-Schalters automatisch wieder angewendet (nur im
+  Integrations-Speicher, geht bei einem HA-Neustart verloren)
 - `sensor` **Feedback Lüftergeschwindigkeit** – tatsächlich laufende Lüfterstufe
   in % (`fanpower`, read-only, 0 % wenn ausgeschaltet)
 - `sensor` **Innen-/Außentemperatur**, **Innen-/Außenfeuchtigkeit**, **CO₂**

@@ -12,11 +12,12 @@ from .api import SiegeniaClient
 from .const import (
     DATA_CLIENT,
     DATA_COORDINATOR,
+    DATA_SPEED_MEMORY,
     DOMAIN,
     PLATFORMS,
     UPDATE_INTERVAL_SECONDS,
 )
-from .device import build_device_info
+from .device import FanSpeedMemory, build_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -85,6 +86,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_CLIENT: client,
         DATA_COORDINATOR: coordinator,
+        DATA_SPEED_MEMORY: FanSpeedMemory(),
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from .const import DOMAIN, KEY_DEVICE_ACTIVE
+from .const import DOMAIN, KEY_AUTOMODE_MAX_AIRFLOW, KEY_DEVICE_ACTIVE, KEY_FAN_POWER
 
 # How long a just-commanded value is shown optimistically before falling back
 # to whatever the coordinator actually reports, in case the command silently
@@ -36,6 +36,25 @@ class OptimisticStateMixin:
         self._optimistic_value = value
         self._optimistic_expires = time.monotonic() + OPTIMISTIC_TIMEOUT_SECONDS
         self.async_write_ha_state()
+
+
+class FanSpeedMemory:
+    """Remembers the last fan speed value set for each mode (manual fanpower
+    vs automatic automode_maxairflow) so that toggling Automatikmodus
+    restores whatever was last configured for the mode being entered,
+    instead of leaving it at whatever value that field currently happens to
+    hold on the device.
+    """
+
+    def __init__(self) -> None:
+        self._values: dict[str, int] = {}
+
+    def remember(self, key: str, value: int) -> None:
+        if key in (KEY_FAN_POWER, KEY_AUTOMODE_MAX_AIRFLOW):
+            self._values[key] = value
+
+    def value_for(self, key: str) -> int | None:
+        return self._values.get(key)
 
 
 def _info_from_data(data: dict | None) -> dict:

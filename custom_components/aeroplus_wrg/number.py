@@ -9,6 +9,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import (
     DATA_CLIENT,
     DATA_COORDINATOR,
+    DATA_SPEED_MEMORY,
     DOMAIN,
     KEY_AUTOMODE,
     KEY_AUTOMODE_MAX_AIRFLOW,
@@ -21,7 +22,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     data = hass.data[DOMAIN][entry.entry_id]
     client = data[DATA_CLIENT]
     coordinator = data[DATA_COORDINATOR]
-    async_add_entities([AeroplusFanSpeedNumber(client, coordinator, entry)])
+    speed_memory = data[DATA_SPEED_MEMORY]
+    async_add_entities([AeroplusFanSpeedNumber(client, coordinator, entry, speed_memory)])
 
 
 class AeroplusFanSpeedNumber(CoordinatorEntity, NumberEntity):
@@ -40,10 +42,11 @@ class AeroplusFanSpeedNumber(CoordinatorEntity, NumberEntity):
     _attr_mode = "slider"
     _attr_icon = "mdi:fan"
 
-    def __init__(self, client, coordinator, entry: ConfigEntry) -> None:
+    def __init__(self, client, coordinator, entry: ConfigEntry, speed_memory) -> None:
         super().__init__(coordinator)
         self._client = client
         self._entry = entry
+        self._speed_memory = speed_memory
         system_name = get_system_name(coordinator.data)
         self._attr_name = f"{system_name} Lüftungsgeschwindigkeit" if system_name else "Aeroplus WRG Lüftungsgeschwindigkeit"
         self._attr_unique_id = f"{entry.entry_id}-fanspeed"
@@ -62,5 +65,8 @@ class AeroplusFanSpeedNumber(CoordinatorEntity, NumberEntity):
         return float(value) if value is not None else None
 
     async def async_set_native_value(self, value: float) -> None:
-        await self._client.set_device_params({self._active_key(): int(round(value))})
+        key = self._active_key()
+        target = int(round(value))
+        await self._client.set_device_params({key: target})
+        self._speed_memory.remember(key, target)
         await self.coordinator.async_request_refresh()
