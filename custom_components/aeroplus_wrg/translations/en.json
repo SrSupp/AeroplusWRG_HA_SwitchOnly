@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Aeroplus WRG",
+        "description": "Credentials for the Siegenia Aeroplus WRG smart module (same ones used in the Siegenia app).",
+        "data": {
+          "host": "Host / IP address",
+          "username": "Username",
+          "password": "Password",
+          "port": "Port",
+          "ssl": "Use SSL"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the device. Check host, credentials and network."
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  }
+}

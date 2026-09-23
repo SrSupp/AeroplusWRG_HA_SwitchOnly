@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Aeroplus WRG verbinden",
+        "description": "Zugangsdaten des Siegenia Aeroplus WRG Smart Moduls (dieselben wie in der Siegenia App).",
+        "data": {
+          "host": "Host / IP-Adresse",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "port": "Port",
+          "ssl": "SSL verwenden"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Gerät fehlgeschlagen. Bitte Host, Zugangsdaten und Netzwerk prüfen."
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät ist bereits konfiguriert."
+    }
+  }
+}
